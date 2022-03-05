@@ -33,8 +33,17 @@ MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", default=None)
 HA_DISCOVERY_PREFIX = os.getenv("HA_DISCOVERY_PREFIX", "ha-discovery")
 
 CONFIG_DATA_KEYS = [
-    "Geo", "hardwarediscovered", "hardwareversion", "Id", "lat", "lon", "SensorId", "ssid", "version",
+    "Geo",
+    "Id",
+    "SensorId",
+    "hardwarediscovered",
+    "hardwareversion",
+    "lat",
+    "lon",
+    "ssid",
+    "version",
 ]
+
 ENABLED_HA_DISCOVERY_KEYS = {
   "current_dewpoint_f": {
       "ha_domain": "sensor",
@@ -60,81 +69,95 @@ ENABLED_HA_DISCOVERY_KEYS = {
       "ha_domain": "sensor",
       "ha_name": ".3um Partical Count A",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_0_3_um_b": {
       "ha_domain": "sensor",
       "ha_name": ".3um Partical Count B",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_0_5_um": {
       "ha_domain": "sensor",
       "ha_name": ".5um Partical Count A",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_0_5_um_b": {
       "ha_domain": "sensor",
       "ha_name": ".5um Partical Count B",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_1_0_um": {
       "ha_domain": "sensor",
       "ha_name": "1um Partical Count A",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_1_0_um_b": {
       "ha_domain": "sensor",
       "ha_name": "1um Partical Count B",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_2_5_um": {
       "ha_domain": "sensor",
       "ha_name": "2.5um Partical Count A",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_2_5_um_b": {
       "ha_domain": "sensor",
       "ha_name": "2.5um Partical Count B",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_5_0_um": {
       "ha_domain": "sensor",
       "ha_name": "5um Partical Count A",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_5_0_um_b": {
       "ha_domain": "sensor",
       "ha_name": "5um Partical Count B",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_10_0_um": {
       "ha_domain": "sensor",
       "ha_name": "10um Partical Count A",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "p_10_0_um_b": {
       "ha_domain": "sensor",
       "ha_name": "10um Partical Count B",
       "ha_unit_of_meas": "um/dl",
+      "ha_default_enabled": "false",
   },
   "pm1_0_atm": {
       "ha_domain": "sensor",
       "ha_name": "1.0um Mass A",
       "ha_unit_of_meas": "ug/m3",
+      "ha_default_enabled": "false",
   },
   "pm1_0_atm_b": {
       "ha_domain": "sensor",
       "ha_name": "1.0um Mass B",
       "ha_unit_of_meas": "ug/m3",
+      "ha_default_enabled": "false",
   },
   "pm1_0_cf_1": {},
   "pm1_0_cf_1_b": {},
-  "pm2.5_aqi": {
+  "pm2_5_aqi": {
       "ha_domain": "sensor",
       "ha_device_class": "aqi",
       "ha_name": "AirQuality A",
       "ha_unit_of_meas": "AQI",
   },
-  "pm2.5_aqi_b": {
+  "pm2_5_aqi_b": {
       "ha_domain": "sensor",
       "ha_device_class": "aqi",
       "ha_name": "AirQuality B",
@@ -144,11 +167,13 @@ ENABLED_HA_DISCOVERY_KEYS = {
       "ha_domain": "sensor",
       "ha_name": "2.5um Mass A",
       "ha_unit_of_meas": "ug/m3",
+      "ha_default_enabled": "false",
   },
   "pm2_5_atm_b": {
       "ha_domain": "sensor",
       "ha_name": "2.5um Mass B",
       "ha_unit_of_meas": "ug/m3",
+      "ha_default_enabled": "false",
   },
   "pm2_5_cf_1": {},
   "pm2_5_cf_1_b": {},
@@ -156,11 +181,13 @@ ENABLED_HA_DISCOVERY_KEYS = {
       "ha_domain": "sensor",
       "ha_name": "10.0um Mass A",
       "ha_unit_of_meas": "ug/m3",
+      "ha_default_enabled": "false",
   },
   "pm10_0_atm_b": {
       "ha_domain": "sensor",
       "ha_name": "10.0um Mass B",
       "ha_unit_of_meas": "ug/m3",
+      "ha_default_enabled": "false",
   },
   "pm10_0_cf_1": {},
   "pm10_0_cf_1_b": {},
@@ -194,6 +221,12 @@ class PurpleAirSensor(object):
             self.__data__ = r.json()
             self.__config__ = {k: v for k, v in self.__data__.items() if k in CONFIG_DATA_KEYS}
             self.__data_timestamp__ = time.time()
+
+            # Patch because these values have a "." in the name, and that doesn't
+            # work with HAs setup.
+            self.__data__["pm2_5_aqi"] = self.__data["pm2.5_aqi"]
+            self.__data__["pm2_5_aqi_b"] = self.__data["pm2.5_aqi_b"]
+
         else:
             self.__data__ = {}
             self.__data_timestamp__ = 0
@@ -253,6 +286,8 @@ def publish_ha_discovery():
 
         if "ha_device_class" in config.keys():
             discovery_data["dev_cla"] = config["ha_device_class"]
+        if "ha_default_enabled" in config.keys():
+            discovery_data["en"] = config["ha_default_enabled"]
 
         client.publish(discovery_topic, json.dumps(discovery_data))
 
