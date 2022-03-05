@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
 
 
 jobs:
@@ -31,6 +30,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./purpleair-to-mqtt
+          push: true
           tags: |
             n0c.io/jlrgraham/purpleair-to-mqtt:latest
 
