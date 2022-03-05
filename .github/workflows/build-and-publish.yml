@@ -31,8 +31,6 @@ jobs:
         with:
           context: ./purpleair-to-mqtt
           push: true
-          tags: |
-            n0c.io/jlrgraham/purpleair-to-mqtt:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
