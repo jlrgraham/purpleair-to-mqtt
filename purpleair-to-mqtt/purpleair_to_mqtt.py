@@ -332,6 +332,7 @@ def run():
         if time.time() > last_publish + PURPLEAIR_FETCH_INTERVAL:
             print("publish_purpleair_data()")
             publish_purpleair_data()
+            last_publish = time.time()
         time.sleep(1)
 
 
