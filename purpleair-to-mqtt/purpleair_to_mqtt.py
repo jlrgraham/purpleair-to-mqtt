@@ -26,7 +26,7 @@ PURPLEAIR_MQTT_PREFIX = os.getenv("PURPLEAIR_MQTT_PREFIX", "purpleair")
 
 MQTT_BROKER = os.getenv("MQTT_BROKER", default="mqtt")
 MQTT_PORT = os.getenv("MQTT_PORT", default=8883)
-MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default=f"purpleair_to_mqtt-{random.randint(0, 1000)}")
+MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default=f"purpleair-to-mqtt-{random.randint(0, 1000)}")
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", default=None)
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", default=None)
 
@@ -326,10 +326,13 @@ def run():
 
     client.publish(will_topic, "true", retain=True)
 
+    last_publish = time.time()
+
     while True:
-        print("publish_purpleair_data()")
-        publish_purpleair_data()
-        time.sleep(PURPLEAIR_FETCH_INTERVAL)
+        if time.time() > last_publish + PURPLEAIR_FETCH_INTERVAL:
+            print("publish_purpleair_data()")
+            publish_purpleair_data()
+        time.sleep(1)
 
 
 if __name__ == "__main__":
