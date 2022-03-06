@@ -326,7 +326,7 @@ def run():
 
     client.publish(will_topic, "true", retain=True)
 
-    last_publish = time.time()
+    last_publish = 0
 
     while True:
         if time.time() > last_publish + PURPLEAIR_FETCH_INTERVAL:
