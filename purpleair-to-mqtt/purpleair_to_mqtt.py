@@ -151,13 +151,13 @@ ENABLED_HA_DISCOVERY_KEYS = {
   },
   "pm1_0_cf_1": {},
   "pm1_0_cf_1_b": {},
-  "pm2_5_aqi": {
+  "pm25_aqi": {
       "ha_domain": "sensor",
       "ha_device_class": "aqi",
       "ha_name": "AirQuality A",
       "ha_unit_of_meas": "AQI",
   },
-  "pm2_5_aqi_b": {
+  "pm25_aqi_b": {
       "ha_domain": "sensor",
       "ha_device_class": "aqi",
       "ha_name": "AirQuality B",
@@ -218,14 +218,13 @@ class PurpleAirSensor(object):
         r = requests.get(self.__url__)
 
         if r.ok:
-            self.__data__ = r.json()
+            jsondata = r.json()
+            jsondata["pm25_aqi"] = jsondata.pop("pm2.5_aqi")
+            jsondata["pm25_aqi_b"] = jsondata.pop("pm2.5_aqi_b")
+
+            self.__data__ = jsondata
             self.__config__ = {k: v for k, v in self.__data__.items() if k in CONFIG_DATA_KEYS}
             self.__data_timestamp__ = time.time()
-
-            # Patch because these values have a "." in the name, and that doesn't
-            # work with HAs setup.
-            self.__data__["pm2_5_aqi"] = self.__data["pm2.5_aqi"]
-            self.__data__["pm2_5_aqi_b"] = self.__data["pm2.5_aqi_b"]
 
         else:
             self.__data__ = {}
