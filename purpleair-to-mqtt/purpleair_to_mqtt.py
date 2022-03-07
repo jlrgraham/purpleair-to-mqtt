@@ -5,6 +5,15 @@ import os
 import random
 import time
 import json
+import logging
+
+
+logger = logging.getLoer(__NAME__)
+log_handler = logging.StreamHandler()
+log_formatter = logging.Formatter('%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
+log_handler.setFormatter(log_formatter)
+logger.addHandler(log_handler)
+logger.setLevel(logging.INFO)
 
 
 def on_connect(client, userdata, flags, rc):
@@ -12,7 +21,7 @@ def on_connect(client, userdata, flags, rc):
         publish_purpleair_config()
         publish_ha_discovery()
     else:
-        print(f"Failed to connect, rc: {rc}")
+        logger.error(f"Failed to connect, rc: {rc}")
 
 
 def on_message(client, userdata, msg):
@@ -303,12 +312,12 @@ def publish_purpleair_data():
         topic = f"{mqtt_prefix}/{key}"
         result = client.publish(topic, value)
         if result != 0:
-            pass # Handle error
+            pass # FIXME: Handle error
 
 
 def run():
     if MQTT_USERNAME is not None and MQTT_PASSWORD is not None:
-        print(f"Connect as: {MQTT_USERNAME}")
+        logger.info(f"Connect as: {MQTT_USERNAME}")
         client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 
     will_topic = f"{PURPLEAIR_MQTT_PREFIX}/{purpleair_sensor.sensor_topic_name()}/online"
@@ -330,7 +339,7 @@ def run():
 
     while True:
         if time.time() > last_publish + PURPLEAIR_FETCH_INTERVAL:
-            print("publish_purpleair_data()")
+            logger.debug("publish_purpleair_data()")
             publish_purpleair_data()
             last_publish = time.time()
         time.sleep(1)
