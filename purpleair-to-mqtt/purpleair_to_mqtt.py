@@ -226,10 +226,14 @@ class PurpleAirSensor(object):
             jsondata = r.json()
             # Some keys contain characters that make them invalid for HA entityt IDs
             # Filter them out
+            key_fixes = []
             for key in jsondata.keys():
                 if key.find('.') > -1:
                     new_key = key.replace('.', '')
-                    jsondata[new_key] = jsondata.pop(key)
+                    key_fixes.append((key, new_key))
+
+            for key, new_key in key_fixes:
+                jsondata[new_key] = jsondata.pop(key)
 
             self.__data__ = jsondata
             self.__config__ = {k: v for k, v in self.__data__.items() if k in CONFIG_DATA_KEYS}
