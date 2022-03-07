@@ -224,8 +224,12 @@ class PurpleAirSensor(object):
 
         if r.ok:
             jsondata = r.json()
-            jsondata["pm25_aqi"] = jsondata.pop("pm2.5_aqi")
-            jsondata["pm25_aqi_b"] = jsondata.pop("pm2.5_aqi_b")
+            # Some keys contain characters that make them invalid for HA entityt IDs
+            # Filter them out
+            for key in jsondata.keys():
+                if key.find('.') > -1:
+                    new_key = key.replace('.', '')
+                    jsondata[new_key] = jsondata.pop(key)
 
             self.__data__ = jsondata
             self.__config__ = {k: v for k, v in self.__data__.items() if k in CONFIG_DATA_KEYS}
@@ -243,20 +247,21 @@ class PurpleAirSensor(object):
 
 
     def data(self):
-        if self.__data__ is None or (time.time() > self.__data_timestamp__ + 60):
+        if self.__data__ is None or (time.time() > self.__data_timestamp__ + self.__data_cache_ttl__):
             self.fetch_purpleair_data()
         return self.__data__
 
     
     def sensor_topic_name(self):
-        simple_sensor_id = self.__data__["SensorId"].replace(":", "")
+        simple_sensor_id = self.data()["SensorId"].replace(":", "")
         return f"purpleair-{simple_sensor_id}"
 
 
 
 def publish_ha_discovery():
     sensor_topic_name = purpleair_sensor.sensor_topic_name()
-    sensor_id = purpleair_sensor.__data__["SensorId"]
+    sensor_data = purpleair_sensor.data()
+    sensor_id = sensor_data["SensorId"]
 
     for key, config in ENABLED_HA_DISCOVERY_KEYS.items():
         if "ha_domain" not in config:
@@ -278,7 +283,7 @@ def publish_ha_discovery():
             "dev": {
                 "mf": "Purple Air, Inc.",
                 "mdl": "PurpleAir PA-II-SD",
-                "sw": purpleair_sensor.__data__["version"],
+                "sw": sensor_data["version"],
                 "name": f"PurpleAir {sensor_id}",
                 "ids": [sensor_id],
                 "cns": [
