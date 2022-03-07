@@ -210,17 +210,13 @@ ENABLED_HA_DISCOVERY_KEYS = {
 
 
 class PurpleAirSensor(object):
-    def __init__(self, hostname):
+    def __init__(self, hostname, cache_ttl=60):
         self.__hostname__ = hostname
-        self.__url__ = f"http://{PURPLEAIR_HOSTNAME}/json?live=true"
+        self.__url__ = f"http://{hostname}/json?live=true"
         self.__config__ = None
         self.__data__ = {}
         self.__data_timestamp__ = 0
-
-        try:
-            self.fetch_purpleair_data()
-        except Exception:
-            pass
+        self.__data_cache_ttl__ = cache_ttl
 
 
     def fetch_purpleair_data(self):
