@@ -18,6 +18,7 @@ logger.setLevel(logging.INFO)
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
+        logger.info("Connected to MQTT broker")
         publish_purpleair_config()
         publish_ha_discovery()
     else:
@@ -76,25 +77,25 @@ ENABLED_HA_DISCOVERY_KEYS = {
   "p25aqic_b": {},
   "p_0_3_um": {
       "ha_domain": "sensor",
-      "ha_name": ".3um Partical Count A",
+      "ha_name": "0.3um Partical Count A",
       "ha_unit_of_meas": "um/dl",
       "ha_default_enabled": "false",
   },
   "p_0_3_um_b": {
       "ha_domain": "sensor",
-      "ha_name": ".3um Partical Count B",
+      "ha_name": "0.3um Partical Count B",
       "ha_unit_of_meas": "um/dl",
       "ha_default_enabled": "false",
   },
   "p_0_5_um": {
       "ha_domain": "sensor",
-      "ha_name": ".5um Partical Count A",
+      "ha_name": "0.5um Partical Count A",
       "ha_unit_of_meas": "um/dl",
       "ha_default_enabled": "false",
   },
   "p_0_5_um_b": {
       "ha_domain": "sensor",
-      "ha_name": ".5um Partical Count B",
+      "ha_name": "0.5um Partical Count B",
       "ha_unit_of_meas": "um/dl",
       "ha_default_enabled": "false",
   },
@@ -233,6 +234,7 @@ class PurpleAirSensor(object):
                     key_fixes.append((key, new_key))
 
             for key, new_key in key_fixes:
+                logger.info(f"PurpleAir JSON, patch key: {key} -> {new_key}")
                 jsondata[new_key] = jsondata.pop(key)
 
             self.__data__ = jsondata
@@ -286,7 +288,7 @@ def publish_ha_discovery():
             "pl_not_avail": "false",
             "dev": {
                 "mf": "Purple Air, Inc.",
-                "mdl": "PurpleAir PA-II-SD",
+                "mdl": sensor_data["hardwarediscovered"],
                 "sw": sensor_data["version"],
                 "name": f"PurpleAir {sensor_id}",
                 "ids": [sensor_id],
@@ -302,7 +304,11 @@ def publish_ha_discovery():
         if "ha_default_enabled" in config.keys():
             discovery_data["en"] = config["ha_default_enabled"]
 
-        client.publish(discovery_topic, json.dumps(discovery_data))
+        (result, mid) = client.publish(discovery_topic, json.dumps(discovery_data))
+        if result != 0:
+            logger.error(f"Error publishing discovery, result: {result}, topic: {discovery_topic}")
+        else:
+            logger.info(f"Published discovery, topic: {discovery_topic}")
 
 
 def publish_purpleair_config():
@@ -315,9 +321,10 @@ def publish_purpleair_data():
 
     for key, value in purpleair_sensor.data().items():
         topic = f"{mqtt_prefix}/{key}"
-        result = client.publish(topic, value)
+        (result, mid) = client.publish(topic, value)
         if result != 0:
-            pass # FIXME: Handle error
+            logger.error(f"Error publishing data: {result}, topic: {topic}")
+            # FIXME: Handle error
 
 
 def run():
@@ -344,7 +351,7 @@ def run():
 
     while True:
         if time.time() > last_publish + PURPLEAIR_FETCH_INTERVAL:
-            logger.debug("publish_purpleair_data()")
+            logger.info("publish_purpleair_data()")
             publish_purpleair_data()
             last_publish = time.time()
         time.sleep(1)
