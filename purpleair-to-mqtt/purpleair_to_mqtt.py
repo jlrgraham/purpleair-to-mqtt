@@ -39,7 +39,7 @@ MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default=f"purpleair-to-mqtt-{random
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", default=None)
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", default=None)
 
-HA_DISCOVERY_PREFIX = os.getenv("HA_DISCOVERY_PREFIX", "ha-discovery")
+HA_DISCOVERY_PREFIX = os.getenv("HA_DISCOVERY_PREFIX", "homeassistant")
 
 CONFIG_DATA_KEYS = [
     "Geo",
