@@ -8,7 +8,7 @@ import json
 import logging
 
 
-logger = logging.getLoer(__NAME__)
+logger = logging.getLogger(__name__)
 log_handler = logging.StreamHandler()
 log_formatter = logging.Formatter('%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
 log_handler.setFormatter(log_formatter)
