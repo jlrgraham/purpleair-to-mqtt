@@ -55,7 +55,7 @@ All settings are taken from environmental variables at runtime.
 | `MQTT_CLIENT_ID` | The client name given to the MQTT broker.  See MQTT Connections for more details. | `purpleair-to-mqtt` |
 | `MQTT_USERNAME` | The username for the MQTT broker. | `None` |
 | `MQTT_PASSWORD` | The password for the MQTT broker. | `None` |
-| `HA_DISCOVERY_PREFIX` | The configured Home Assitant discovery prefix. | `homeassistant` |
+| `HA_DISCOVERY_PREFIX` | The configured Home Assistant discovery prefix. | `homeassistant` |
 
 
 ### MQTT Connections
@@ -70,7 +70,7 @@ The MQTT client ID can be configured with the `MQTT_CLIENT_ID` variable.  This s
 
 #### TLS
 
-If the MQTT borker port configuration is set to 8883 then the connector will automatically attempt to enable TLS for the connection to the broker.  The standard [Python certifi package](https://pypi.org/project/certifi/) will be used for CA roots, so public certs (ie: Let's Encrypt + others) should just work.
+If the MQTT broker port configuration is set to 8883 then the connector will automatically attempt to enable TLS for the connection to the broker.  The standard [Python certifi package](https://pypi.org/project/certifi/) will be used for CA roots, so public certs (ie: Let's Encrypt + others) should just work.
 
 ### MQTT Topics
 
@@ -78,10 +78,10 @@ There are two topic configuration controls: `PURPLEAIR_MQTT_PREFIX` and `HA_DISC
 
 The `PURPLEAIR_MQTT_PREFIX` setting will control the top level prefix in MQTT used for PurpleAir data.  This is intended to be a namespace for PurpleAir sensors allowing for multiple to coexist and be discovered on a single broker.  Each sensor will have data published under `<PURPLEAIR_MQTT_PREFIX>/purpleair-<SENSOR_IDENTIFIER>` where `SENSOR_IDENTIFIER` is the hex only version of the sensor's MAC address.
 
-Within the sensor's prefix in MQTT the following topics are published (example sensor with a MAC address of `1b:ad:co:ff:ee`:
+Within the sensor's prefix in MQTT the following topics are published (example sensor with a MAC address of `1b:ad:c0:ff:ee`:
 
     purpleair/
-        purpleair-1badcoffee/
+        purpleair-1badc0ffee/
             config = JSON Object, select keys from sensor data
             data/
                 p_0_3_um = 0.3um value A from the sensor
