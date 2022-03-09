@@ -2,7 +2,6 @@ import requests
 import paho.mqtt.client as mqtt
 import certifi
 import os
-import random
 import time
 import json
 import logging
@@ -36,7 +35,7 @@ PURPLEAIR_MQTT_PREFIX = os.getenv("PURPLEAIR_MQTT_PREFIX", "purpleair")
 
 MQTT_BROKER = os.getenv("MQTT_BROKER", default="mqtt")
 MQTT_PORT = os.getenv("MQTT_PORT", default=8883)
-MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default=f"purpleair-to-mqtt-{random.randint(0, 1000)}")
+MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default=f"purpleair-to-mqtt")
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", default=None)
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", default=None)
 

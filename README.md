@@ -52,7 +52,7 @@ All settings are taken from environmental variables at runtime.
 | `PURPLEAIR_MQTT_PREFIX` | The MQTT prefix under which to publish sensor data.  See MQTT Topics for more details. | `purpleair` |
 | `MQTT_BROKER` | The hostname or IP of the MQTT broker. | `mqtt` |
 | `MQTT_PORT` | The connection port on the MQTT broker.  If set to 8883 TLS is automatically used. | 8883 |
-| `MQTT_CLIENT_ID` | The client name given to the MQTT broker.  See MQTT Connections for more details. | `purpleair-to-mqtt-{random(0,1000)}` |
+| `MQTT_CLIENT_ID` | The client name given to the MQTT broker.  See MQTT Connections for more details. | `purpleair-to-mqtt` |
 | `MQTT_USERNAME` | The username for the MQTT broker. | `None` |
 | `MQTT_PASSWORD` | The password for the MQTT broker. | `None` |
 | `HA_DISCOVERY_PREFIX` | The configured Home Assitant discovery prefix. | `homeassistant` |
