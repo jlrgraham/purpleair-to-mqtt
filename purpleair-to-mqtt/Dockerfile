@@ -1,6 +1,4 @@
-FROM python:3
-
-LABEL version="0.0.1"
+FROM python:3-slim
 
 RUN pip install requests paho-mqtt certifi
 
