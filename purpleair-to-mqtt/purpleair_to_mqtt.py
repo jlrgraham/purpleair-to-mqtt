@@ -30,7 +30,7 @@ def on_message(client, userdata, msg):
 
 
 PURPLEAIR_HOSTNAME = os.getenv("PURPLEAIR_HOSTNAME", default="purpleair")
-PURPLEAIR_FETCH_INTERVAL = os.getenv("PURPLEAIR_FETCH_INTERVAL", 60)
+PURPLEAIR_FETCH_INTERVAL = int(os.getenv("PURPLEAIR_FETCH_INTERVAL", 60))
 PURPLEAIR_MQTT_PREFIX = os.getenv("PURPLEAIR_MQTT_PREFIX", "purpleair")
 
 MQTT_BROKER = os.getenv("MQTT_BROKER", default="mqtt")
@@ -369,7 +369,7 @@ if __name__ == "__main__":
     if MQTT_BROKER is None:
         raise Exception("MQTT_BROKER must be defined.")
 
-    purpleair_sensor = PurpleAirSensor(PURPLEAIR_HOSTNAME)
+    purpleair_sensor = PurpleAirSensor(PURPLEAIR_HOSTNAME, cache_ttl=(PURPLEAIR_FETCH_INTERVAL - 1))
     client = mqtt.Client(MQTT_CLIENT_ID)
 
     run()
