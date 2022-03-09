@@ -338,14 +338,21 @@ def run():
     client.on_message = on_message
 
     if MQTT_PORT == 8883:
+        logger.info("MQTT: Enable TLS.")
         client.tls_set(certifi.where())
 
     client.will_set(will_topic, payload="false", retain=True)
+
+    logger.info(f"Connect to MQTT: {MQTT_BROKER}:{MQTT_PORT}")
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
     client.loop_start()
 
-    client.publish(will_topic, "true", retain=True)
+    (result, mid) = client.publish(will_topic, "true", retain=True)
+    if result != 0:
+        logger.error(f"Error publishing to LWT, result: {result}, will_topic: {will_topic}")
+    else:
+        logger.info(f"Publish online to LWT, will_topic: {will_topic}")
 
     last_publish = 0
 
