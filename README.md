@@ -78,10 +78,10 @@ There are two topic configuration controls: `PURPLEAIR_MQTT_PREFIX` and `HA_DISC
 
 The `PURPLEAIR_MQTT_PREFIX` setting will control the top level prefix in MQTT used for PurpleAir data.  This is intended to be a namespace for PurpleAir sensors allowing for multiple to coexist and be discovered on a single broker.  Each sensor will have data published under `<PURPLEAIR_MQTT_PREFIX>/purpleair-<SENSOR_IDENTIFIER>` where `SENSOR_IDENTIFIER` is the hex only version of the sensor's MAC address.
 
-Within the sensor's prefix in MQTT the following topics are published (example sensor with a MAC address of `1b:ad:c0:ff:ee`:
+Within the sensor's prefix in MQTT the following topics are published (example sensor with a MAC address of `00:1b:ad:c0:ff:ee`:
 
     purpleair/
-        purpleair-1badc0ffee/
+        purpleair-001badc0ffee/
             config = JSON Object, select keys from sensor data
             data/
                 p_0_3_um = 0.3um value A from the sensor
