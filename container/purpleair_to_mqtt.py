@@ -386,7 +386,7 @@ def publish_ha_discovery():
         logger.debug(f"discovery_data: {json.dumps(discovery_data)}")
         logger.debug(f"abbreviated_discovery_data: {json.dumps(abbreviated_discovery_data)}")
 
-        (result, mid) = client.publish(discovery_topic, json.dumps(discovery_data))
+        (result, mid) = client.publish(discovery_topic, json.dumps(discovery_data), retain=True)
         if result != 0:
             logger.error(f"MQTT: Error publishing discovery, result: {result}, topic: {discovery_topic}")
         else:
@@ -406,7 +406,6 @@ def publish_purpleair_data():
         (result, mid) = client.publish(topic, value)
         if result != 0:
             logger.error(f"MQTT: Error publishing data: {result}, topic: {topic}")
-            # FIXME: Handle error
 
 
 def run():
