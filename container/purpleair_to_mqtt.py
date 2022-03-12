@@ -6,6 +6,9 @@ import time
 import json
 import logging
 
+from homeassistant.components.mqtt.abbreviations import ABBREVIATIONS as HA_MQTT_ABBREVIATIONS
+from homeassistant.components.mqtt.abbreviations import DEVICE_ABBREVIATIONS as HA_MQTT_DEVICE_ABBREVIATIONS
+
 
 logger = logging.getLogger(__name__)
 log_handler = logging.StreamHandler()
@@ -15,13 +18,40 @@ logger.addHandler(log_handler)
 logger.setLevel(logging.INFO)
 
 
+HA_MQTT_TO_ABBREVIATIONS = {v: k for k, v in HA_MQTT_ABBREVIATIONS.items()}
+HA_MQTT_TO_DEVICE_ABBREVIATIONS = {v: k for k, v in HA_MQTT_DEVICE_ABBREVIATIONS.items()}
+
+def abbreviate_ha_mqtt_keys(data):
+    def rendered_generator(data, parent_key=None):
+        # Quick wrapper to ensure we don't get back a data structure with a bunch
+        # of nested generators, doesn't easily seralize.
+        if isinstance(data, dict):
+            return dict(generator(data, parent_key=parent_key))
+        else:
+            return data
+
+    def generator(data, parent_key=None):
+        # Adjust which table we lookup in based on the parent_key, this should be the
+        # key matching the data block we receive.  HA stores the "device" abbreviations
+        # in a separate varible.
+        lookup_table = HA_MQTT_TO_ABBREVIATIONS
+        if parent_key is not None and parent_key == "device":
+            lookup_table = HA_MQTT_TO_DEVICE_ABBREVIATIONS
+
+        for key, value in data.items():
+            logger.debug(f"abbreviate_ha_mqtt_keys generator: {key} -> {lookup_table.get(key, key)}")
+            yield lookup_table.get(key, key), rendered_generator(value, parent_key=key)
+
+    return rendered_generator(data)
+
+
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        logger.info("Connected to MQTT broker")
+        logger.info("MQTT: Connected to broker.")
         publish_purpleair_config()
         publish_ha_discovery()
     else:
-        logger.error(f"Failed to connect, rc: {rc}")
+        logger.error(f"MQTT: Failed to connect, rc: {rc}")
 
 
 def on_message(client, userdata, msg):
@@ -56,155 +86,203 @@ CONFIG_DATA_KEYS = [
 ENABLED_HA_DISCOVERY_KEYS = {
   "current_dewpoint_f": {
       "ha_domain": "sensor",
-      "ha_device_class": "temperature",
       "ha_name": "Dewpoint",
-      "ha_unit_of_meas": "°F",
+      "ha_discovery_config": {
+          "device_class": "temperature",
+          "unit_of_measurement": "°F",
+      },
   },
   "current_humidity": {
       "ha_domain": "sensor",
-      "ha_device_class": "humidity",
       "ha_name": "Humidity",
-      "ha_unit_of_meas": "%",
+      "ha_discovery_config": {
+          "device_class": "humidity",
+          "unit_of_measurement": "%",
+      },
   },
   "current_temp_f": {
       "ha_domain": "sensor",
-      "ha_device_class": "temperature",
       "ha_name": "Temperature",
-      "ha_unit_of_meas": "°F",
+      "ha_discovery_config": {
+          "device_class": "temperature",
+          "unit_of_measurement": "°F",
+      },
   },
   "p25aqic": {},
   "p25aqic_b": {},
   "p_0_3_um": {
       "ha_domain": "sensor",
       "ha_name": "0.3um Partical Count A",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_0_3_um_b": {
       "ha_domain": "sensor",
       "ha_name": "0.3um Partical Count B",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_0_5_um": {
       "ha_domain": "sensor",
       "ha_name": "0.5um Partical Count A",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_0_5_um_b": {
       "ha_domain": "sensor",
       "ha_name": "0.5um Partical Count B",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_1_0_um": {
       "ha_domain": "sensor",
       "ha_name": "1um Partical Count A",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_1_0_um_b": {
       "ha_domain": "sensor",
       "ha_name": "1um Partical Count B",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_2_5_um": {
       "ha_domain": "sensor",
       "ha_name": "2.5um Partical Count A",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_2_5_um_b": {
       "ha_domain": "sensor",
       "ha_name": "2.5um Partical Count B",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_5_0_um": {
       "ha_domain": "sensor",
       "ha_name": "5um Partical Count A",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_5_0_um_b": {
       "ha_domain": "sensor",
       "ha_name": "5um Partical Count B",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_10_0_um": {
       "ha_domain": "sensor",
       "ha_name": "10um Partical Count A",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "p_10_0_um_b": {
       "ha_domain": "sensor",
       "ha_name": "10um Partical Count B",
-      "ha_unit_of_meas": "um/dl",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "um/dl",
+          "enabled_by_default": "false",
+      },
   },
   "pm1_0_atm": {
       "ha_domain": "sensor",
       "ha_name": "1.0um Mass A",
-      "ha_unit_of_meas": "ug/m3",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "ug/m3",
+          "enabled_by_default": "false",
+      },
   },
   "pm1_0_atm_b": {
       "ha_domain": "sensor",
       "ha_name": "1.0um Mass B",
-      "ha_unit_of_meas": "ug/m3",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "ug/m3",
+          "enabled_by_default": "false",
+      },
   },
   "pm1_0_cf_1": {},
   "pm1_0_cf_1_b": {},
   "pm25_aqi": {
       "ha_domain": "sensor",
-      "ha_device_class": "aqi",
-      "ha_name": "AirQuality A",
-      "ha_unit_of_meas": "AQI",
+      "device_class": "aqi",
+      "ha_discovery_config": {
+          "ha_name": "AirQuality A",
+          "unit_of_measurement": "AQI",
+      },
   },
   "pm25_aqi_b": {
       "ha_domain": "sensor",
-      "ha_device_class": "aqi",
-      "ha_name": "AirQuality B",
-      "ha_unit_of_meas": "AQI",
+      "device_class": "aqi",
+      "ha_discovery_config": {
+          "ha_name": "AirQuality B",
+          "unit_of_measurement": "AQI",
+      },
   },
   "pm2_5_atm": {
       "ha_domain": "sensor",
       "ha_name": "2.5um Mass A",
-      "ha_unit_of_meas": "ug/m3",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "ug/m3",
+          "enabled_by_default": "false",
+      },
   },
   "pm2_5_atm_b": {
       "ha_domain": "sensor",
       "ha_name": "2.5um Mass B",
-      "ha_unit_of_meas": "ug/m3",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "ug/m3",
+          "enabled_by_default": "false",
+      },
   },
   "pm2_5_cf_1": {},
   "pm2_5_cf_1_b": {},
   "pm10_0_atm": {
       "ha_domain": "sensor",
       "ha_name": "10.0um Mass A",
-      "ha_unit_of_meas": "ug/m3",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "ug/m3",
+          "enabled_by_default": "false",
+      },
   },
   "pm10_0_atm_b": {
       "ha_domain": "sensor",
       "ha_name": "10.0um Mass B",
-      "ha_unit_of_meas": "ug/m3",
-      "ha_default_enabled": "false",
+      "ha_discovery_config": {
+          "unit_of_measurement": "ug/m3",
+          "enabled_by_default": "false",
+      },
   },
   "pm10_0_cf_1": {},
   "pm10_0_cf_1_b": {},
   "pressure": {
       "ha_domain": "sensor",
-      "ha_device_class": "pressure",
       "ha_name": "Pressure",
-      "ha_unit_of_meas": "mbar",
+      "ha_discovery_config": {
+          "device_class": "pressure",
+          "unit_of_measurement": "mbar",
+      },
   },
 }
 
@@ -278,36 +356,37 @@ def publish_ha_discovery():
         discovery_data = {
             "~": topic_base,
             "name": f"PurpleAir {sensor_id} {config['ha_name']}",
-            "uniq_id": f"{sensor_topic_name}-{key}",
-            "unit_of_meas": config["ha_unit_of_meas"],
-            "stat_t": f"{topic_base}/data/{key}",
-            "stat_cla": "measurement",
-            "avty_t": f"{topic_base}/online",
-            "pl_avail": "true",
-            "pl_not_avail": "false",
-            "dev": {
-                "mf": "Purple Air, Inc.",
-                "mdl": sensor_data["hardwarediscovered"],
-                "sw": sensor_data["version"],
+            "unique_id": f"{sensor_topic_name}-{key}",
+            "state_topic": f"{topic_base}/data/{key}",
+            "state_class": "measurement",
+            "availability_topic": f"{topic_base}/online",
+            "payload_available": "true",
+            "payload_not_available": "false",
+            "device": {
+                "manufacturer": "Purple Air, Inc.",
+                "model": sensor_data["hardwarediscovered"],
+                "sw_version": sensor_data["version"],
                 "name": f"PurpleAir {sensor_id}",
                 "ids": [sensor_id],
-                "cns": [
+                "connections": [
                     ["mac", sensor_id]
                 ],
-                "cu": f"http://{PURPLEAIR_HOSTNAME}/",
+                "configuration_url": f"http://{PURPLEAIR_HOSTNAME}/",
             },
         }
 
-        if "ha_device_class" in config.keys():
-            discovery_data["dev_cla"] = config["ha_device_class"]
-        if "ha_default_enabled" in config.keys():
-            discovery_data["en"] = config["ha_default_enabled"]
+        for discovery_key, value in config.get("ha_discovery_config", {}).items():
+            discovery_data[discovery_key] = value
+
+        abbreviated_discovery_data = abbreviate_ha_mqtt_keys(discovery_data)
+        logger.debug(f"discovery_data: {json.dumps(discovery_data)}")
+        logger.debug(f"abbreviated_discovery_data: {json.dumps(abbreviated_discovery_data)}")
 
         (result, mid) = client.publish(discovery_topic, json.dumps(discovery_data))
         if result != 0:
-            logger.error(f"Error publishing discovery, result: {result}, topic: {discovery_topic}")
+            logger.error(f"MQTT: Error publishing discovery, result: {result}, topic: {discovery_topic}")
         else:
-            logger.info(f"Published discovery, topic: {discovery_topic}")
+            logger.info(f"MQTT: Published discovery, topic: {discovery_topic}")
 
 
 def publish_purpleair_config():
@@ -322,13 +401,13 @@ def publish_purpleair_data():
         topic = f"{mqtt_prefix}/{key}"
         (result, mid) = client.publish(topic, value)
         if result != 0:
-            logger.error(f"Error publishing data: {result}, topic: {topic}")
+            logger.error(f"MQTT: Error publishing data: {result}, topic: {topic}")
             # FIXME: Handle error
 
 
 def run():
     if MQTT_USERNAME is not None and MQTT_PASSWORD is not None:
-        logger.info(f"Connect as: {MQTT_USERNAME}")
+        logger.info(f"MQTT: Authentication enabled, connect as: {MQTT_USERNAME}")
         client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 
     will_topic = f"{PURPLEAIR_MQTT_PREFIX}/{purpleair_sensor.sensor_topic_name()}/online"
@@ -342,22 +421,22 @@ def run():
 
     client.will_set(will_topic, payload="false", retain=True)
 
-    logger.info(f"Connect to MQTT: {MQTT_BROKER}:{MQTT_PORT}")
+    logger.info(f"MQTT: Connect to {MQTT_BROKER}:{MQTT_PORT} ({MQTT_CLIENT_ID})")
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
     client.loop_start()
 
     (result, mid) = client.publish(will_topic, "true", retain=True)
     if result != 0:
-        logger.error(f"Error publishing to LWT, result: {result}, will_topic: {will_topic}")
+        logger.error(f"MQTT: Error publishing to LWT, result: {result}, will_topic: {will_topic}")
     else:
-        logger.info(f"Publish online to LWT, will_topic: {will_topic}")
+        logger.info(f"MQTT: Publish online to LWT, will_topic: {will_topic}")
 
     last_publish = 0
 
     while True:
         if time.time() > last_publish + PURPLEAIR_FETCH_INTERVAL:
-            logger.info("publish_purpleair_data()")
+            logger.debug("publish_purpleair_data()")
             publish_purpleair_data()
             last_publish = time.time()
         time.sleep(1)
