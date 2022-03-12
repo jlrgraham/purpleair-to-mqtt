@@ -108,8 +108,8 @@ ENABLED_HA_DISCOVERY_KEYS = {
           "unit_of_measurement": "°F",
       },
   },
-  "p25aqic": {},
-  "p25aqic_b": {},
+  #"p25aqic": {},
+  #"p25aqic_b": {},
   "p_0_3_um": {
       "ha_domain": "sensor",
       "ha_name": "0.3um Partical Count A",
@@ -222,8 +222,8 @@ ENABLED_HA_DISCOVERY_KEYS = {
           "enabled_by_default": "false",
       },
   },
-  "pm1_0_cf_1": {},
-  "pm1_0_cf_1_b": {},
+  #"pm1_0_cf_1": {},
+  #"pm1_0_cf_1_b": {},
   "pm25_aqi": {
       "ha_domain": "sensor",
       "ha_name": "AirQuality A",
@@ -256,8 +256,8 @@ ENABLED_HA_DISCOVERY_KEYS = {
           "enabled_by_default": "false",
       },
   },
-  "pm2_5_cf_1": {},
-  "pm2_5_cf_1_b": {},
+  #"pm2_5_cf_1": {},
+  #"pm2_5_cf_1_b": {},
   "pm10_0_atm": {
       "ha_domain": "sensor",
       "ha_name": "10.0um Mass A",
@@ -274,8 +274,8 @@ ENABLED_HA_DISCOVERY_KEYS = {
           "enabled_by_default": "false",
       },
   },
-  "pm10_0_cf_1": {},
-  "pm10_0_cf_1_b": {},
+  #"pm10_0_cf_1": {},
+  #"pm10_0_cf_1_b": {},
   "pressure": {
       "ha_domain": "sensor",
       "ha_name": "Pressure",
