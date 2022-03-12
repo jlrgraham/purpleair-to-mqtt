@@ -226,17 +226,17 @@ ENABLED_HA_DISCOVERY_KEYS = {
   "pm1_0_cf_1_b": {},
   "pm25_aqi": {
       "ha_domain": "sensor",
-      "device_class": "aqi",
+      "ha_name": "AirQuality A",
       "ha_discovery_config": {
-          "ha_name": "AirQuality A",
+          "device_class": "aqi",
           "unit_of_measurement": "AQI",
       },
   },
   "pm25_aqi_b": {
       "ha_domain": "sensor",
-      "device_class": "aqi",
+      "ha_name": "AirQuality B",
       "ha_discovery_config": {
-          "ha_name": "AirQuality B",
+          "device_class": "aqi",
           "unit_of_measurement": "AQI",
       },
   },
@@ -348,6 +348,10 @@ def publish_ha_discovery():
 
     for key, config in ENABLED_HA_DISCOVERY_KEYS.items():
         if "ha_domain" not in config:
+            logger.warning(f"No 'ha_domain' setting found for {key}, skipping.")
+            continue
+        if "ha_name" not in config:
+            logger.warning(f"No 'ha_name' setting found for {key}, skipping.")
             continue
 
         topic_base = f"{PURPLEAIR_MQTT_PREFIX}/{sensor_topic_name}"
