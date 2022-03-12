@@ -1,2 +1,2 @@
 *.sw?
-purpleair-to-mqtt/.env
+.envrc
