@@ -224,7 +224,7 @@ class PurpleAirSensor(object):
 
         if r.ok:
             jsondata = r.json()
-            # Some keys contain characters that make them invalid for HA entityt IDs
+            # Some keys contain characters that make them invalid for HA entity IDs
             # Filter them out
             key_fixes = []
             for key in jsondata.keys():
