@@ -1,13 +1,13 @@
-FROM python:3-slim AS ha_wheel_builder
+FROM python:3.10-slim AS ha_wheel_builder
 
-RUN apt-get update && apt-get install \
+RUN apt update && apt install \
     -y --no-install-recommends \
     build-essential
 
 RUN pip wheel homeassistant
 
 
-FROM python:3-slim
+FROM python:3.10-slim
 
 RUN pip install requests paho-mqtt certifi
 
