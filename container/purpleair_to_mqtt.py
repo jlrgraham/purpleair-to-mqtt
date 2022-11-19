@@ -5,6 +5,7 @@ import os
 import time
 import json
 import logging
+from distutils.util import strtobool
 
 from homeassistant.components.mqtt.abbreviations import ABBREVIATIONS as HA_MQTT_ABBREVIATIONS
 from homeassistant.components.mqtt.abbreviations import DEVICE_ABBREVIATIONS as HA_MQTT_DEVICE_ABBREVIATIONS
@@ -49,7 +50,8 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         logger.info("MQTT: Connected to broker.")
         publish_purpleair_config()
-        publish_ha_discovery()
+        if HA_DISCOVERY_ENABLED:
+            publish_ha_discovery()
     else:
         logger.error(f"MQTT: Failed to connect, rc: {rc}")
 
@@ -69,6 +71,7 @@ MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default=f"purpleair-to-mqtt")
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", default=None)
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", default=None)
 
+HA_DISCOVERY_ENABLED = strtobool(os.getenv("HA_DISCOVERY_ENABLED", default="True"))
 HA_DISCOVERY_PREFIX = os.getenv("HA_DISCOVERY_PREFIX", "homeassistant")
 
 CONFIG_DATA_KEYS = [

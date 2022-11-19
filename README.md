@@ -55,6 +55,7 @@ All settings are taken from environmental variables at runtime.
 | `MQTT_CLIENT_ID` | The client name given to the MQTT broker.  See MQTT Connections for more details. | `purpleair-to-mqtt` |
 | `MQTT_USERNAME` | The username for the MQTT broker. | `None` |
 | `MQTT_PASSWORD` | The password for the MQTT broker. | `None` |
+| `HA_DISCOVERY_ENABLED` | Enable publishing of HA discovery topics. | `True` |
 | `HA_DISCOVERY_PREFIX` | The configured Home Assistant discovery prefix. | `homeassistant` |
 
 
